@@ -1,0 +1,75 @@
+---
+title: "Salamander Survival"
+author: "Alexandra Scott"
+format: html
+editor: visual
+---
+
+## Data Simulation
+
+The research question asks what effect canopy cover percentage has on salamander survival. The study design includes 12 forest fragments with 20 individual salamanders in each fragment for a total of 240 individual salamanders. The response variable is survival which is binary (the salamander either survived (1) during the study period or died (0)). This matters for analysis because it will require use of the binomial distribution.
+
+```{r}
+library(tidyverse) 
+library(lme4)  #for mixed models later
+
+set.seed(42) #ensures the same data is simulated during repeat attempts
+
+#Define the experimental structure
+n_fragments <- 12 #12 forest fragments
+n_salamanders_per_fragment <- 20 #20 salamanders sampled in each fragment
+n_total <- n_fragments * n_salamanders_per_fragment #total number of salamanders across all fragments
+
+#Define the truth
+true_intercept <- -3.5 #the real intercept will be 3.5 (survival without any canopy)          
+true_canopy_effect <- 0.09 #the real effect of canopy is an increase of 9% survival with a unit increase of canopy
+
+#Create fragment-level data
+fragment_data <- data.frame(
+  fragment_id = 1:n_fragments,
+  canopy_cover = runif(n_fragments, min = 40, max = 90)
+) #simulates percent of canopy cover for each fragment
+
+#Create salamander-level data (each salamander belongs to a fragment)
+salamander_data <- data.frame(
+  salamander_id = 1:n_total,
+  fragment_id = rep(1:n_fragments, each = n_salamanders_per_fragment)
+) #salamander ID numbers and fragment where salamanders are located
+
+#Merge to get canopy cover for each salamander
+salamander_data <- salamander_data %>%
+  left_join(fragment_data, by = "fragment_id") #add canopy cover for each fragment and salamander as a column
+
+#Simulate survival using logistic regression formula
+salamander_data <- salamander_data %>%
+  mutate(
+    log_odds = true_intercept + true_canopy_effect * canopy_cover,
+    prob_survival = 1 / (1 + exp(-log_odds)),
+    survived = rbinom(n_total, size = 1, prob = prob_survival)
+  ) #gives log odds of survival with real intercept/slope; also gives probability of survival based on those log odds; says whether each salamander lived or died (1 or 0) based on these odds
+
+#Look at the data
+head(salamander_data)
+summary(salamander_data)
+
+#Visualize: proportion surviving in each fragment
+fragment_summary <- salamander_data %>%
+  group_by(fragment_id, canopy_cover) %>%
+  summarise(
+    n_survived = sum(survived),
+    n_total = n(),
+    prop_survived = n_survived / n_total,
+    .groups = "drop"
+  ) #gives number that survived in each fragment out of the total, then also gives that as a percentage
+
+ggplot(fragment_summary, aes(x = canopy_cover, y = prop_survived)) +
+  geom_point(size = 4, alpha = 0.7) +
+  labs(
+    title = "Simulated: Canopy Cover vs. Salamander Survival",
+    subtitle = "Each point = one forest fragment (20 salamanders each)",
+    x = "Canopy Cover (%)",
+    y = "Proportion Survived"
+  ) +
+  ylim(0, 1) +
+  theme_minimal(base_size = 14) #plots the survival percentage data
+```
