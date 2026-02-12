@@ -5,7 +5,7 @@ format: html
 editor: visual
 ---
 
-## Data Simulation
+# Data Simulation
 
 The research question asks what effect canopy cover percentage has on salamander survival. The study design includes 12 forest fragments with 20 individual salamanders in each fragment for a total of 240 individual salamanders. The response variable is survival which is binary (the salamander either survived (1) during the study period or died (0)). This matters for analysis because it will require use of the binomial distribution.
 
@@ -73,3 +73,19 @@ ggplot(fragment_summary, aes(x = canopy_cover, y = prop_survived)) +
   ylim(0, 1) +
   theme_minimal(base_size = 14) #plots the survival percentage data
 ```
+
+# First Model
+
+```{r}
+glm(survived ~ canopy_cover, data = salamander_data, family = binomial)
+```
+
+**What does this model assume about the salamanders?** This model assumes that salamanders are independent and that the probability of survival for each is individual.
+
+**Are salamanders within the same fragment truly independent? Why or why not?** They are not independent because individuals in the same fragment experience the same effects.
+
+**What is the unit of replication in this experiment — the salamander or the fragment?** The forest fragment is the unit of replication.
+
+**What problem might arise if we ignore the fragment structure?** Ignoring this and counting each salamander as a replicate would be pseudo-replication.
+
+**Key question: If salamanders in the same fragment are more similar to each other than to salamanders in other fragments (e.g., because of fragment-specific conditions), what happens to our standard errors and p-values?** The standard errors and p-values will be too small and precision will be incorrect.
