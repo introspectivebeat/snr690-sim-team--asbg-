@@ -107,3 +107,7 @@ summary(wrong_mod)
 **What problem might arise if we ignore the fragment structure?** Ignoring this and counting each salamander as a replicate would be pseudo-replication.
 
 **Key question: If salamanders in the same fragment are more similar to each other than to salamanders in other fragments (e.g., because of fragment-specific conditions), what happens to our standard errors and p-values?** The standard errors and p-values will be too small and precision will be incorrect.
+
+# What I Learned
+
+The proposed model (the second one on this page) was problematic because it did not account for salamanders being nested into forest fragments and not being independent. Treating them as independent constitutes psuedoreplication, since salamanders in the same fragment experience the same effect of canopy cover. The question involves understanding the effect of canopy cover on salamander survival, the data includes 20 salamanders from each of 12 transects, and so the method must account for this nested structure and the binomial model must incorporate the random effect of forest fragment.
