@@ -74,10 +74,28 @@ ggplot(fragment_summary, aes(x = canopy_cover, y = prop_survived)) +
   theme_minimal(base_size = 14) #plots the survival percentage data
 ```
 
-# First Model
+# Improved Model
 
 ```{r}
-glm(survived ~ canopy_cover, data = salamander_data, family = binomial)
+improved_mod <- glmer(survived ~ canopy_cover + (1 | fragment_id), family = binomial, data = salamander_data) 
+summary(improved_mod)
+```
+
+**How did the estimate of the canopy cover effect change?** The estimate did not change between the two models. Both estimates equal 0.09069.
+
+**How did the standard error change? (Bigger? Smaller?)** The standard error did not change between the two models. Both standard errors equal 0.02329.
+
+**Did the p-value change?** The p-value changed slightly, from 0.89e-05 to 0.9e-05.
+
+**Why does accounting for fragment structure matter?** This matters to account for the fact that individual salamanders in the same fragment experience the same effects of canopy cover.
+
+**Which model do you trust more, and why?** I trust this model more because it takes fragment effect on multiple salamanders into consideration. Although the difference between these two models is not very evident in this example, with a larger or more variable dataset this would be very important.
+
+# First Attempt Model (Incorrect)
+
+```{r}
+wrong_mod <- glm(survived ~ canopy_cover, data = salamander_data, family = binomial)
+summary(wrong_mod)
 ```
 
 **What does this model assume about the salamanders?** This model assumes that salamanders are independent and that the probability of survival for each is individual.
