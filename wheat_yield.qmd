@@ -93,3 +93,14 @@ This models assumes that the blocks have the same effect or no effect on yield a
 If we ignore that block 2 has a higher crop yield, then we would overestimate the amount of which wheat does better generally.
 Furthermore, the implication would mean that each field a wheat variety is grown in, would have to have the exact soil type as block 2 in this experiment.
 If we ignore blocks, the variety estimates are inaccurate and useless to determine which wheat variety produces the highest yield.
+
+A better model:
+
+```{r}
+install.packages("lme4")
+library(lme4)
+
+lmer(yield ~ variety + (variety_effect|block_effect), data = wheat_data)
+
+
+```
