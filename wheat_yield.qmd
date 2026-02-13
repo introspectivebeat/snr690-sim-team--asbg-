@@ -1,0 +1,95 @@
+---
+title: "Wheat Trial Yields"
+author: "Brittnany Graham"
+format: html
+editor: visual
+---
+
+### Part 1: Adding comments to the lines of code and what they do
+
+Research Question:
+
+Which combination of block and wheat variety produces the highest yield?
+
+For this experiment, a block is a field that has different quality of soil which affects the total yield of each wheat variety different.
+Within the block itself, there is one plot of each wheat variety, where the total plots is twenty.
+The block structure matters because it takes into account the how different soil quality affects different wheat strains because some would do better in different types of soil because soil is not uniform across America.
+
+```{r}
+library(tidyverse)
+
+set.seed(123) # setting the seed helps with reproducibility
+
+# Define experimental structure
+varieties <- c("A", "B", "C", "D", "E") # 5 wheat varieties
+blocks <- c("Block1", "Block2", "Block3", "Block4") # the different field to account for variability, there are 5 fields in each block
+
+# Define the truth
+baseline_yield <- 3000  # kg/ha for variety A in block 1
+
+variety_effects <- c(
+  A = 0,
+  B = 200,
+  C = 350,
+  D = 100,
+  E = -50
+) # adding what the true variety effects are to each of the varieties
+
+block_effects <- c(
+  Block1 = 0,
+  Block2 = 150,
+  Block3 = -100,
+  Block4 = 200
+) # block effect is the general effect of the field itself 
+
+noise_sd <- 120
+
+# Create all combinations of variety and block (full factorial design)
+wheat_data <- expand.grid(
+  variety = varieties,
+  block = blocks
+) # creating the data frame of all possibilities
+
+# Add true yield based on variety and block effects
+wheat_data <- wheat_data %>%
+  mutate(
+    variety_effect = variety_effects[variety],
+    block_effect = block_effects[block],
+    true_yield = baseline_yield + variety_effect + block_effect,
+    yield = true_yield + rnorm(n(), mean = 0, sd = noise_sd)
+  ) # updating the data frame with values indexed based on variety and block effects established above, then set an uninformative prior to not restrict the model and giving final yield
+
+# Look at the data
+head(wheat_data)
+summary(wheat_data)
+
+# Visualize
+ggplot(wheat_data, aes(x = variety, y = yield, color = block)) +
+  geom_point(size = 4, alpha = 0.7, position = position_dodge(width = 0.3)) +
+  stat_summary(fun = mean, geom = "crossbar", width = 0.5, 
+               color = "black", size = 0.3) +
+  labs(
+    title = "Simulated: Wheat Variety Yields Across Blocks",
+    subtitle = "Each point = one plot; crossbar = variety mean across blocks",
+    x = "Wheat Variety",
+    y = "Yield (kg/ha)",
+    color = "Block"
+  ) +
+  theme_minimal(base_size = 14)
+```
+
+### Part 2: Running models
+
+Simple anova model
+
+```{r}
+
+aov(yield ~ variety, wheat_data)
+
+
+```
+
+This models assumes that the blocks have the same effect or no effect on yield across all blocks.
+If we ignore that block 2 has a higher crop yield, then we would overestimate the amount of which wheat does better generally.
+Furthermore, the implication would mean that each field a wheat variety is grown in, would have to have the exact soil type as block 2 in this experiment.
+If we ignore blocks, the variety estimates are inaccurate and useless to determine which wheat variety produces the highest yield.

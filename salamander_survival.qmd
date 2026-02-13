@@ -7,7 +7,10 @@ editor: visual
 
 ## Data Simulation
 
-The research question asks what effect canopy cover percentage has on salamander survival. The study design includes 12 forest fragments with 20 individual salamanders in each fragment for a total of 240 individual salamanders. The response variable is survival which is binary (the salamander either survived (1) during the study period or died (0)). This matters for analysis because it will require use of the binomial distribution.
+The research question asks what effect canopy cover percentage has on salamander survival.
+The study design includes 12 forest fragments with 20 individual salamanders in each fragment for a total of 240 individual salamanders.
+The response variable is survival which is binary (the salamander either survived (1) during the study period or died (0)).
+This matters for analysis because it will require use of the binomial distribution.
 
 ```{r}
 library(tidyverse) 
