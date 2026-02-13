@@ -129,3 +129,11 @@ yield_plot <- ggplot(wheat_data, aes(variety, yield, color = block)) +
 
 yield_plot
 ```
+
+### What I Learned:
+
+The bad model is problematic because it does not include the blocking effects, more specifically, it doesn't take into account how the different variations of soil will affect the different wheat varieties.
+Ignoring this block structure means the model will give inaccurate and unmeaningful results.
+Even though we are looking at crop yield, we have to use a model that will take into account the block design and how each block *does* have an effect on yield because the soil quality is different.
+This will glean more meaningful results because this agronomist understands that soil qualities across America is not uniform.
+This will help farmers determine which wheat will produce the highest yield dependent on the quality of their soil.
