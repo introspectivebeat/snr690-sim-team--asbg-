@@ -80,13 +80,35 @@ ggplot(wheat_data, aes(x = variety, y = yield, color = block)) +
 
 ### Part 2: Running models
 
+#### Good model
+
+```{r}
+install.packages("lme4")
+library(lme4)
+install.packages("lmerTest")
+library(lmerTest)
+
+better_model <- lmer(yield ~ variety + (1|block), data = wheat_data)
+summary(better_model)
+anova(better_model)
+```
+
+There are a large difference between the residuals between the 'bad' model and the 'better' model because in the 'bad' model, the blocks are not taken into account, meaning the variation between fields and the results are therefore not reflected in the model, meaning the residuals are larger.
+When the blocks are taken into account the residuals are smaller because it takes into account the noise and variation between the fields, which makes the residuals smaller and have more statistical power (larger F-statistic).
+The means changed to reflect the variability and noise taken into account for each block.
+The Intercept is the mean yield of variety A across all blocks.
+In the subsequent variety categories, are how many units more or less than A they yielded.
+So if variety A is 3187, then variety B had a mean of 3294 (3187+207).
+I like to think of the intercept as the baseline, and the following units are what "shift" the baseline up or down, so you can see the yield of each variety.
+
+#### What not to do
+
 Simple anova model
 
 ```{r}
 
-aov(yield ~ variety, wheat_data)
-
-
+bad <- aov(yield ~ variety, wheat_data)  
+summary(bad)
 ```
 
 This models assumes that the blocks have the same effect or no effect on yield across all blocks.
@@ -94,13 +116,16 @@ If we ignore that block 2 has a higher crop yield, then we would overestimate th
 Furthermore, the implication would mean that each field a wheat variety is grown in, would have to have the exact soil type as block 2 in this experiment.
 If we ignore blocks, the variety estimates are inaccurate and useless to determine which wheat variety produces the highest yield.
 
-A better model:
+**Visualizing it:**
 
 ```{r}
-install.packages("lme4")
-library(lme4)
+yield_plot <- ggplot(wheat_data, aes(variety, yield, color = block)) +
+  geom_point(size = 3) +
+  theme_classic() +
+  labs(title = "Yield by Variety and Block",
+       x = "Variety",
+       y = 'Yield',
+       color = "Field Block")
 
-lmer(yield ~ variety + (variety_effect|block_effect), data = wheat_data)
-
-
+yield_plot
 ```
